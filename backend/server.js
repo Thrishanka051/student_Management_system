@@ -1,4 +1,5 @@
 const express = require("express");
+const path = require('path');
 const mongoose = require("mongoose");
 const bodyParser = require("body-parser");
 const cors = require("cors");
@@ -7,6 +8,9 @@ const dotenv = require("dotenv");
 require("dotenv").config();
 
 const app = express();
+
+// Serve static files in the 'uploads' directory
+app.use('/uploads', express.static(path.join(__dirname, 'uploads')));
 
 const PORT = process.env.PORT || 8070;
 

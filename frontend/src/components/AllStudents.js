@@ -11,7 +11,7 @@ export default function AllStudents({ searchQuery }) {
     const[userId,setUserID]=useState(null);
     const [isOpen, setisOpen] = useState(false);
     const [marks, setMarks] = useState (null);
-   
+    const [selectedFile, setSelectedFile] = useState(null);
 
     
     const cardColors = ['#b3b3ff', '#ff9999', '#99ff99', '#ffcc99'];
@@ -75,6 +75,10 @@ export default function AllStudents({ searchQuery }) {
         setMarks({...student.marks});
     };
 
+    const handleFileChange = (e) => {
+        setSelectedFile(e.target.files[0]);
+    };
+
     const handleDelete = async(student) => {
         await axiosInstance.delete(`/student/delete/${student._id}`,{ withCredentials: true })
             .then(() => {
@@ -90,8 +94,17 @@ export default function AllStudents({ searchQuery }) {
     };
 
     const handleSave = async() => {
+            const formData = new FormData();
+            formData.append('name', editingStudent.name);
+            formData.append('age', editingStudent.age);
+            formData.append('marks', JSON.stringify(marks));
+            if (selectedFile) {
+                formData.append('image', selectedFile); // Add the image file to the form data
+            }
         try{
-            await axiosInstance.put(`/student/update/${editingStudent._id}`, editingStudent,{ withCredentials: true });
+            await axiosInstance.put(`/student/update/${editingStudent._id}`, formData,{headers: {
+                'Content-Type': 'multipart/form-data'
+            }, withCredentials: true });
             alert("Student updated successfully");
             setEditingStudent(null); // Clear the editing state after saving
             getSubjects(); // Fetch updated student list
@@ -103,8 +116,10 @@ export default function AllStudents({ searchQuery }) {
         }catch(err) {
                 if(err.response && err.response.status === 401){
                     alert('You need to Sign back In')
+                }else if (err.response && err.response.status === 500){
+                  alert('Error: Images Only!');
                 }else
-                  alert(err.message);
+                    alert(err.message);
             };
     };
     const onClose = ()=>{
@@ -169,6 +184,11 @@ export default function AllStudents({ searchQuery }) {
                                                 <label htmlFor="physics" className="form-label" style={{ marginRight: '5px', width: '100px' }}>Physics:</label>
                                                 <input className="form-control" type="number" value={marks.physics} onChange={(e) => setMarks({ ...marks, physics: e.target.value })} placeholder="Marks" />
                                             </div>
+                                            {/* Image upload field */}
+                                            <div className="form-group">
+                                                <label htmlFor="imageUpload" className="form-label">Upload Image:</label>
+                                                <input type="file" className="form-control" onChange={handleFileChange} />
+                                            </div>
                                             
                                         </div>
                                         </div>
@@ -177,7 +197,8 @@ export default function AllStudents({ searchQuery }) {
                                 ) : (
                                     <div>
                                         <h5 class="customCard-header card-header flex-wrap " style={{wordWrap:'break-word' , overflowWrap:'break-word'}}>
-                                            <i class="fas fa-user"></i> {student.name}
+                                        <img src={`http://localhost:8070${student.image}`} alt="Student" style={{ width: '100%', height: '200px', objectFit: 'cover', marginBottom: '10px' }} />{student.name}
+
                                         </h5>
                                         <p class="customCard-text card-text">
                                             <i class="fas fa-birthday-cake"></i> Age: {student.age}
@@ -191,7 +212,9 @@ export default function AllStudents({ searchQuery }) {
                                              Physics: {student.marks.physics}
                                         </p>
 
-                                                                            <>
+                                        
+
+                                        <>
                                         {userRole === 'admin' && (
                                             <>
                                             <button className="btn btn-primary" onClick={() => handleEdit(student)}>Edit</button>

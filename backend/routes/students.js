@@ -1,10 +1,47 @@
+const express = require("express");
 const router= require("express").Router();
+const multer = require('multer');
+const path = require('path');
 const student= require("../modules/Student");
 const User = require('../modules/UserModel');
 const bcrypt = require('bcrypt');
 const {userVerification,roleMiddleware } = require("../Middlewares/AuthMiddleware");
 const generatePassword = require('../util/generatePassword'); // import the generate password function
 const Subject = require("../modules/subject");
+
+//const app = express();
+// Configure Multer storage
+const storage = multer.diskStorage({
+  destination: (req, file, cb) => {
+    cb(null, './uploads/'); // Set where to store the uploaded images
+  },
+  filename: (req, file, cb) => {
+    cb(null, Date.now() + path.extname(file.originalname)); // Rename the file to avoid conflicts
+  }
+});
+
+// Multer file filter to allow only image files
+const fileFilter = (req, file, cb) => {
+  // Allowed file types
+  const fileTypes = /jpeg|jpg|png/;
+  // Test file extension
+  const extname = fileTypes.test(path.extname(file.originalname).toLowerCase());
+  // Test MIME type
+  const mimetype = fileTypes.test(file.mimetype);
+
+  if (mimetype && extname) {
+    return cb(null, true); // Accept the file
+  } else {
+    cb(new Error('Only image files are allowed (jpeg, jpg, png)')); // Reject the file
+  }
+};
+
+// Multer middleware for file handling with the file filter applied
+const upload = multer({ 
+  storage: storage,
+  fileFilter: fileFilter
+});
+
 
 router.post('/add', userVerification, roleMiddleware('admin'), async (req, res) => {
   try {
@@ -44,7 +81,7 @@ router.route("/").get(userVerification,async(req,res)=>{
     })
 })
 
-router.route("/update/:id").put(userVerification,async(req,res)=>{
+router.route("/update/:id").put(userVerification, upload.single('image'),async(req,res)=>{
     let userID = req.params.id;
     const {name, age}= req.body;
     const Student = await student.findById(userID);
@@ -63,10 +100,17 @@ router.route("/update/:id").put(userVerification,async(req,res)=>{
         name,
         age
     };
+
+    if (req.file) {
+      updateStudent.image = `/uploads/${req.file.filename}`; // Save the accessible URL path
+ // Save the image path in the database
+    }
+
     try {
-        const studentUpdate = student.findByIdAndUpdate(userID, updateStudent);
-        const userUpdate = User.findByIdAndUpdate(req.user._id, { username:name });
-    
+        const studentUpdate = await student.findByIdAndUpdate(userID, updateStudent);
+        const userUpdate = await User.findByIdAndUpdate(req.user._id, { username:name });
+
+       
         await Promise.all([studentUpdate, userUpdate]);
     
         res.status(200).send({ status: 'User and student updated successfully.' });
