@@ -187,7 +187,8 @@ export default function AllStudents({ searchQuery }) {
                                             {/* Image upload field */}
                                             <div className="form-group">
                                                 <label htmlFor="imageUpload" className="form-label">Upload Image:</label>
-                                                <input type="file" className="form-control" onChange={handleFileChange} />
+                                                <input type="file" className="form-control"   accept="image/*"  // Restrict to image file types
+                                                onChange={handleFileChange} />
                                             </div>
                                             
                                         </div>

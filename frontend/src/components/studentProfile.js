@@ -18,6 +18,7 @@ export default function UserProfile({isOpen, onClose, userId, getAll}) {
   const [newPassword, setNewPassword] = useState('');
   const [confirmPassword, setConfirmPassword] = useState('');
   const [message, setMessage] = useState('');
+  const [selectedFile , setSelectedFile] = useState (null)
   
 
   useEffect(()=>{
@@ -50,11 +51,26 @@ export default function UserProfile({isOpen, onClose, userId, getAll}) {
   };
 
   const handleSaveClick = async () => {
+    const formData = new FormData();
+    // Append only the necessary fields from the user object
+    if (user.name) formData.append('name', user.name);
+    if (user.email) formData.append('email', user.email);
+    if (user.age) formData.append('age', user.age);
+
+    // Append the image file to the formData if a new file is selected
+    if (selectedFile) {
+        formData.append('image', selectedFile); // New file
+    } else if (user.image) {
+        // If no new file, send the existing image path
+        formData.append('image', user.image);
+    }
   try {
-      await axiosInstance.put(`/student/update/${userId}`, user, { withCredentials: true });
+      await axiosInstance.put(`/student/update/${userId}`, formData, {headers: {
+        'Content-Type': 'multipart/form-data'
+    }, withCredentials: true });
       setIsEditing(false);
       alert('Profile updated successfully.');
-      getAll();
+      fetchUserProfile();
     } catch (err) {
       console.error(err);
       alert('Failed to update profile.');
@@ -62,13 +78,10 @@ export default function UserProfile({isOpen, onClose, userId, getAll}) {
   };
 
   const handleFileChange = (e) => {
-    /*const file = e.target.files[0];
-    const reader = new FileReader();
-    reader.onloadend = () => {
-      setUser((prevUser) => ({ ...prevUser, photo: reader.result }));
-    };
-    reader.readAsDataURL(file);*/
+    setSelectedFile(e.target.files[0]);
+    
   };
+
   const handleClose = () => {
     setSidebar(false);
     onClose(); // Notify parent component that the sidebar is closed
@@ -126,15 +139,16 @@ export default function UserProfile({isOpen, onClose, userId, getAll}) {
         <div className="card shadow-sm" >
           <div className="card-body text-center" >
             <div className="mb-3 d-flex align-items-center justify-content-center flex-wrap">
-              {user.photo ? (
-                <img src={user.photo} alt="User" className="img-fluid rounded-circle" width="150" height="150" />
+              {user.image ? (
+                <img src={`http://localhost:8070${user.image}`} alt="User" className="img-fluid rounded-circle" width="150" height="150" />
               ) : (
                 <div className="img-placeholder rounded-circle " style={{ width: '150px', height: '150px', backgroundColor: '#f0f0f0' }}></div>
               )}
             </div>
             {isEditing && (
               <div className="form-group">
-                <input type="file" className="form-control-file" onChange={handleFileChange} />
+                <input type="file" className="form-control-file"  accept="image/*"  // Restrict to image file types 
+                onChange={handleFileChange} />
               </div>
             )}
           </div >
