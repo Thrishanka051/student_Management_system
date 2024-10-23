@@ -7,6 +7,7 @@ import { Home, Login, Signup } from "./pages";
 import Header1 from './components/header';
 import StudentProfile from './components/studentProfile';
 import MarksList from './components/MarksList';
+import PaymentSlipUpload from './components/UploadSlip'
 import '@fortawesome/fontawesome-free/css/all.min.css';
 
 function App() {
@@ -31,6 +32,7 @@ function App() {
           <Route path="/" exact element={<AllStudents searchQuery={searchQuery} />} />
           <Route path="/profile" element={<StudentProfile />} />
           <Route path="/marksList" element={<MarksList />} />
+          <Route path="/upload-slip" component={PaymentSlipUpload} />
         </Routes>
 
       <style>{`

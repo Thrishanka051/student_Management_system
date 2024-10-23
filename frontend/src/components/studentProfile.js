@@ -1,5 +1,7 @@
 import React, { useState, useEffect } from 'react';
+import { Modal, Button } from 'react-bootstrap';
 import axios from 'axios';
+import PaymentSlipUpload from './UploadSlip'
 import './Profile.css'; // Import the CSS file for styling
 import axiosInstance from '../axiosConfig';
 
@@ -18,7 +20,17 @@ export default function UserProfile({isOpen, onClose, userId, getAll}) {
   const [newPassword, setNewPassword] = useState('');
   const [confirmPassword, setConfirmPassword] = useState('');
   const [message, setMessage] = useState('');
-  const [selectedFile , setSelectedFile] = useState (null)
+  const [selectedFile , setSelectedFile] = useState (null);
+  const [slip,setSlip] = useState(false);
+  const [showModal, setShowModal] = useState(false);
+
+  const handleOpenModal = () => {
+    setShowModal(true);
+  };
+
+  const handleCloseModal = () => {
+    setShowModal(false);
+  };
   
 
   useEffect(()=>{
@@ -119,17 +131,29 @@ export default function UserProfile({isOpen, onClose, userId, getAll}) {
     const handlePassword= ()=>{
         setEditPassword(true);
     }
+
+    const handleSlip = () => {
+      window.open('/upload-slip', '_blank', 'width=600,height=600');
+    }
     const handleback=()=>{
       setEditPassword(false);
       setOldPassword('');
       setNewPassword('');
       setConfirmPassword('');
       setMessage('');
+      setSlip(false);
       
     }
 
   return (
     <div className={`profile-sidebar ${sidebar ? 'open' : ''}`}>
+      { /* slip ? (
+        <>
+        <PaymentSlipUpload />
+        <button className="btn btn-primary"><i class="fa-solid fa-rotate-left " onClick={handleback} /></button>
+        </>
+        
+      ):( */}
       <div className="container mt-25">
       <div className="d-flex justify-content-between align-items-center mb-4">
         <h1 className="h1 mb-4" style={{color:"#fff"}}>User Profile</h1>
@@ -246,10 +270,26 @@ export default function UserProfile({isOpen, onClose, userId, getAll}) {
         
         <div>
             <button className='btn btn-warning mt-0' onClick={handlePassword}>Change Password</button>
+            <button className='btn btn-primary mt-0' onClick={handleOpenModal}>Upload Slip</button>
           </div>
       </div>
       )}
       </div>
+      
+      {/* Modal */}
+      <Modal show={showModal} onHide={handleCloseModal} style={{zIndex:'5005'}}>
+        <Modal.Header closeButton>
+          <Modal.Title>Upload Payment Slip</Modal.Title>
+        </Modal.Header>
+        <Modal.Body>
+          <PaymentSlipUpload />
+        </Modal.Body>
+        <Modal.Footer>
+          <Button variant="secondary" onClick={handleCloseModal}>
+            Close
+          </Button>
+        </Modal.Footer>
+      </Modal>
     </div>
   );
 }
