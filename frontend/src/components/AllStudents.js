@@ -2,6 +2,7 @@ import React, { useState, useEffect } from "react";
 import axiosInstance from '../axiosConfig'; // Import the configured Axios instance
 import UserProfile from "./studentProfile";
 
+
 //import Header1 from "./header";
 
 export default function AllStudents({ searchQuery }) {
@@ -230,6 +231,7 @@ export default function AllStudents({ searchQuery }) {
                             </div>
                         </div>
                         {userId === student.user && <UserProfile isOpen={isOpen} onClose={onClose} userId={student._id} getAll={getSubjects}/>}
+                      
                     </div>
                     
                 ))}

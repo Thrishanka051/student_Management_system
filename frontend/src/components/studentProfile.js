@@ -275,14 +275,13 @@ export default function UserProfile({isOpen, onClose, userId, getAll}) {
       </div>
       )}
       </div>
-      
       {/* Modal */}
       <Modal show={showModal} onHide={handleCloseModal} style={{zIndex:'5005'}}>
         <Modal.Header closeButton>
           <Modal.Title>Upload Payment Slip</Modal.Title>
         </Modal.Header>
         <Modal.Body>
-          <PaymentSlipUpload />
+          <PaymentSlipUpload studentId={userId} />
         </Modal.Body>
         <Modal.Footer>
           <Button variant="secondary" onClick={handleCloseModal}>

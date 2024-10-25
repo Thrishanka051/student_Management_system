@@ -1,8 +1,9 @@
 import React, { useState } from 'react';
+import axiosInstance from '../axiosConfig';
 import Tesseract from 'tesseract.js';
 import '../styles/uploadSlip.css';
 
-const PaymentSlipUpload = () => {
+const PaymentSlipUpload = ({studentId}) => {
   const [formData, setFormData] = useState({
     transactionId: '',
     transactionDate: '',
@@ -97,10 +98,21 @@ const extractDate = (text) => {
   };
 
   // Handle form submission
-  const handleSubmit = (e) => {
+  const handleSubmit = async (e) => {
     e.preventDefault();
-    console.log('Form Data:', formData);
-    // You can now send formData to the backend (e.g., via Axios)
+    console.log('req:', formData);
+    const config = {
+      headers: { 'Content-Type': 'multipart/form-data' },
+      withCredentials: true // Allows cookies to be sent with the request
+    };
+    console.log('req:', formData);
+    
+    try {
+      const response = await axiosInstance.post(`student/students/${studentId}/upload-slip`, formData, config);
+      console.log('Response2:', response.data);
+    } catch (error) {
+      console.error('Error submitting payment slip:', error);
+    }
   };
 
   return (

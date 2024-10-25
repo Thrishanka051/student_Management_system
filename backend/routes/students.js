@@ -151,4 +151,49 @@ router.route("/get/:id").get(userVerification,async(req,res)=>{
     })
 })
 
+// Route to submit payment slip
+router.post('/students/:id/upload-slip', upload.single('paymentSlip'), async (req, res) => {
+  try {
+    const studentId = req.params.id;
+    console.log(req);
+    const { transactionId, amount, paymentDate, payerName, status } = req.body;
+    const slipPath = req.file.path; // Path to the uploaded slip
+
+    // Find student and add new payment entry
+    const Student = await student.findById(studentId);
+    if (!Student) return res.status(404).json({ message: 'Student not found' });
+
+    // Create new payment entry
+    const newPayment = {
+      transactionId,
+      amount,
+      paymentDate,
+      payerName,
+      status: status || 'Pending', // Default to 'Pending' if not specified
+      slipPath,
+    };
+
+    // Add the new payment to the payments array
+    Student.payments.push(newPayment);
+
+    // Check if the slip is approved, then handle LIFO storage
+    if (status === 'Verified') {
+      // Filter to keep only the last three verified payments in LIFO order
+      Student.payments = Student.payments
+        .filter(payment => payment.status === 'Verified') // Keep only verified payments
+        .slice(-3); // Keep the last three
+    }
+
+    // Save the updated student document
+    await Student.save();
+
+    res.status(200).json({ message: 'Payment slip submitted successfully', payment: newPayment });
+  } catch (error) {
+    console.error('Error submitting payment slip:', error);
+    res.status(500).json({ message: 'Server error' });
+  }
+});
+
+
+
 module.exports= router;
