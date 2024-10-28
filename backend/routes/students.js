@@ -1,6 +1,7 @@
 const express = require("express");
 const router= require("express").Router();
 const multer = require('multer');
+const fs = require('fs');
 const path = require('path');
 const student= require("../modules/Student");
 const User = require('../modules/UserModel');
@@ -41,6 +42,15 @@ const upload = multer({
   storage: storage,
   fileFilter: fileFilter
 });
+
+// Helper function to delete file
+const deleteFile = (filePath) => {
+  fs.unlink(filePath, (err) => {
+    if (err) console.error('Error deleting file:', err);
+    else console.log('File deleted:', filePath);
+  });
+};
+
 
 
 router.post('/add', userVerification, roleMiddleware('admin'), async (req, res) => {
@@ -155,15 +165,20 @@ router.route("/get/:id").get(userVerification,async(req,res)=>{
 router.post('/students/:id/upload-slip', upload.single('paymentSlip'), async (req, res) => {
   try {
     const studentId = req.params.id;
-    console.log(req);
     const { transactionId, amount, paymentDate, payerName, status } = req.body;
     const slipPath = req.file.path; // Path to the uploaded slip
 
-    // Find student and add new payment entry
+    // Find the student document
     const Student = await student.findById(studentId);
     if (!Student) return res.status(404).json({ message: 'Student not found' });
 
-    // Create new payment entry
+    // Ensure payments is an array
+    Student.payments = Student.payments || [];
+
+    // Check if there's a pending payment slip
+    const pendingPaymentIndex = Student.payments.findIndex(payment => payment.status === 'Pending');
+
+    // Create a new payment entry
     const newPayment = {
       transactionId,
       amount,
@@ -173,10 +188,19 @@ router.post('/students/:id/upload-slip', upload.single('paymentSlip'), async (re
       slipPath,
     };
 
-    // Add the new payment to the payments array
-    Student.payments.push(newPayment);
+    if (pendingPaymentIndex > -1) {
+      // Delete the previous pending slip file
+      const oldSlipPath = Student.payments[pendingPaymentIndex].slipPath;
+      deleteFile(oldSlipPath);
 
-    // Check if the slip is approved, then handle LIFO storage
+      // Replace the existing pending payment with the new one
+      Student.payments[pendingPaymentIndex] = newPayment;
+    } else {
+      // No pending payment, so add the new one to the payments array
+      Student.payments.push(newPayment);
+    }
+
+    // If the slip is approved, handle LIFO storage for the last three verified slips
     if (status === 'Verified') {
       // Filter to keep only the last three verified payments in LIFO order
       Student.payments = Student.payments
@@ -184,7 +208,7 @@ router.post('/students/:id/upload-slip', upload.single('paymentSlip'), async (re
         .slice(-3); // Keep the last three
     }
 
-    // Save the updated student document
+    // Save the updated Student document
     await Student.save();
 
     res.status(200).json({ message: 'Payment slip submitted successfully', payment: newPayment });
@@ -194,6 +218,4 @@ router.post('/students/:id/upload-slip', upload.single('paymentSlip'), async (re
   }
 });
 
-
-
-module.exports= router;
+module.exports = router;

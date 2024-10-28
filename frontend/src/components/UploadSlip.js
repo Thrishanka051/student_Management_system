@@ -13,6 +13,10 @@ const PaymentSlipUpload = ({studentId}) => {
   });
   const [loading, setLoading] = useState(false);
   const [ocrText, setOcrText] = useState('');
+  const [isSubmitted, setIsSubmitted] = useState(false); // New state to track submission
+  const [imagePreview, setImagePreview] = useState(null); // For image preview
+
+
 
   // Handle input field changes (manual editing)
   const handleChange = (e) => {
@@ -31,6 +35,7 @@ const PaymentSlipUpload = ({studentId}) => {
         ...prevState,
         paymentSlip: file,
       }));
+      setImagePreview(URL.createObjectURL(file)); // Set image preview
 
       // Start OCR
       setLoading(true);
@@ -110,10 +115,16 @@ const extractDate = (text) => {
     try {
       const response = await axiosInstance.post(`student/students/${studentId}/upload-slip`, formData, config);
       console.log('Response2:', response.data);
+      setIsSubmitted(true);
     } catch (error) {
       console.error('Error submitting payment slip:', error);
     }
   };
+
+  // Conditionally render based on submission status
+  if (isSubmitted) {
+    return <p>Payment slip submitted successfully!</p>;
+  }
 
   return (
     <div className="custom-payment-form-container">
@@ -187,13 +198,28 @@ const extractDate = (text) => {
             style={{ display: 'none' }} // Hide default input button
           />
           <label htmlFor="paymentSlip">
-            <p>Click to upload</p>
-            <p>or drag and drop files here</p>
+          {imagePreview ? (
+              <div>
+                <img src={imagePreview} alt="Payment Slip Preview" />
+                {loading && (
+                  <div className="loading-overlay">
+                    <div className="spinner"></div>
+                  </div>
+                )}
+              </div>
+            ) : (
+              <>
+                <p>Click to upload</p>
+                <p>or drag and drop files here</p>
+              </>
+            )}
           </label>
         </div>
 
-        {/* Display Loading State */}
+        {/* Display Loading State 
         {loading && <p>Processing payment slip...</p>}
+        */}
+        
 
         {/* Submit Button */}
         <button type="submit" className="custom-submit-btn">Submit</button>
