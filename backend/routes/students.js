@@ -9,6 +9,7 @@ const bcrypt = require('bcrypt');
 const {userVerification,roleMiddleware } = require("../Middlewares/AuthMiddleware");
 const generatePassword = require('../util/generatePassword'); // import the generate password function
 const Subject = require("../modules/subject");
+const Notification = require('../modules/notification')
 
 //const app = express();
 // Configure Multer storage
@@ -209,7 +210,21 @@ router.post('/students/:id/upload-slip', upload.single('paymentSlip'), async (re
     }
 
     // Save the updated Student document
-    await Student.save();
+    const savedStudent= await Student.save();
+
+    // Create a notification for the admin(s)
+    const admins = await User.find({ role: 'admin' });
+    const paymentId = savedStudent.payments[savedStudent.payments.length - 1]._id;
+
+    for (const admin of admins) {
+      await Notification.create({
+        senderId:studentId,
+        receiverId: admin._id,
+        paymentId,
+        status: 'Pending',
+        isRead: false,
+      });
+    }
 
     res.status(200).json({ message: 'Payment slip submitted successfully', payment: newPayment });
   } catch (error) {

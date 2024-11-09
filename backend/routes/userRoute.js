@@ -42,5 +42,21 @@ router.post('/change-password',userVerification, async (req, res) => {
   }
 });
 
+// Get unread notifications for admin users
+router.get('/notifications/admin',userVerification, async (req, res) => {
+  try {
+    const adminId = req.user._id; // Assuming you have user authentication
+    const notifications = await Notification.find({ userId: adminId, isRead: false })
+      .populate('paymentId')
+      .sort({ createdAt: -1 });
+
+    res.status(200).json(notifications);
+  } catch (error) {
+    console.error('Error fetching notifications:', error);
+    res.status(500).json({ message: 'Server error' });
+  }
+});
+
+
 module.exports = router;
 
