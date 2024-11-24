@@ -1,0 +1,31 @@
+.admin-notifications ul {
+    list-style: none;
+    padding: 0;
+  }
+  
+  .admin-notifications li {
+    cursor: pointer;
+    padding: 10px;
+    border: 1px solid #ddd;
+    margin-bottom: 5px;
+  }
+  
+  .admin-notifications li.unread {
+    background-color: #f5f5f5;
+  }
+  
+  .notification-details {
+    border: 1px solid #ddd;
+    padding: 15px;
+    margin-top: 15px;
+  }
+  
+  .notification-details .receipt img {
+    max-width: 100%;
+    height: auto;
+  }
+  
+  .actions button {
+    margin-right: 10px;
+  }
+  

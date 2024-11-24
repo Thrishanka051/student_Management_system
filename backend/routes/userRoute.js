@@ -2,6 +2,10 @@ const express = require('express');
 const router = express.Router();
 const { userVerification } = require('../Middlewares/AuthMiddleware');
 const User = require('../modules/UserModel');
+const Notification = require('../modules/notification'); 
+const Student = require('../modules/Student');
+
+
 
 router.get('/role', userVerification, (req, res) => {
   res.json({ role: req.user.role });
@@ -42,20 +46,51 @@ router.post('/change-password',userVerification, async (req, res) => {
   }
 });
 
-// Get unread notifications for admin users
-router.get('/notifications/admin',userVerification, async (req, res) => {
+router.get('/notifications/admin', userVerification, async (req, res) => {
   try {
-    const adminId = req.user._id; // Assuming you have user authentication
-    const notifications = await Notification.find({ userId: adminId, isRead: false })
-      .populate('paymentId')
-      .sort({ createdAt: -1 });
+    const adminId = req.user._id; 
+    const notifications = await Notification.find({ receiverId: adminId })
+      .sort({ createdAt: -1 });  // First, get the notifications sorted
 
-    res.status(200).json(notifications);
+    // Now populate the fields after the query resolves
+    const populatedNotifications = await Notification.populate(notifications, [
+      { path: 'senderId', select: 'name' },  // Populate senderId with name
+      
+    ]);
+
+    res.status(200).json(populatedNotifications);
   } catch (error) {
     console.error('Error fetching notifications:', error);
     res.status(500).json({ message: 'Server error' });
   }
 });
+
+
+router.patch('/notifications/:id/approve-reject', async (req, res) => {
+  try {
+    const { status } = req.body; // 'Approved' or 'Rejected'
+    const notification = await Notification.findById(req.params.id);
+
+    if (!notification) return res.status(404).json({ message: 'Notification not found' });
+
+    // Update the notification and payment status
+    notification.status = status;
+    notification.isRead = true;
+    await notification.save();
+
+    // Update the payment status in the student schema
+    const student = await Student.findOne({ 'payments._id': notification.paymentId });
+    const payment = student.payments.id(notification.paymentId);
+    payment.status = status;
+    await student.save();
+
+    res.status(200).json({ message: `Payment ${status.toLowerCase()} successfully` });
+  } catch (error) {
+    console.error('Error updating payment status:', error);
+    res.status(500).json({ message: 'Server error' });
+  }
+});
+
 
 
 module.exports = router;

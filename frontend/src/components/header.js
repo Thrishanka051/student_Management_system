@@ -105,6 +105,20 @@ function Header1({ setSearchQuery, searchQuery }) {
                                 Student Marks
                             </Link>
                         </li>
+                        <li className="nav-item">
+                            <Link
+                                to="/admin-notify"
+                                className="nav-link"
+                                style={{
+                                    ...linkStyles,
+                                    backgroundColor: activeTab === "Notifications" ? 'red' : 'green',
+                                }}
+                                onClick={() => handleTabClick("Notifications")}
+                            >
+                                Notifications
+                            </Link>
+                        </li>
+                        
                         </>)}
                         
                     </ul>
