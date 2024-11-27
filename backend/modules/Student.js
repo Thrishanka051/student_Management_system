@@ -6,7 +6,7 @@ const PaymentSchema = new mongoose.Schema({
     amount: { type: Number, required: false },
     paymentDate: { type: Date, required: false },
     payerName: { type: String, required: false },
-    status: { type: String, enum: ['Pending', 'Verified', 'Rejected'], default: 'Pending' },
+    status: { type: String, enum: ['Pending', 'Approved', 'Rejected'], default: 'Pending' },
     slipPath: String, // Path to the uploaded slip file
   });
 

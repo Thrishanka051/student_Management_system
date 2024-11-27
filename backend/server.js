@@ -5,6 +5,8 @@ const bodyParser = require("body-parser");
 const cors = require("cors");
 const cookieParser = require("cookie-parser");
 const dotenv = require("dotenv");
+const http = require("http"); 
+const { Server } = require("socket.io");
 require("dotenv").config();
 
 const app = express();
@@ -48,6 +50,38 @@ app.use('/user', userRoutes);
 const subjectRoutes = require ('./routes/subjectRoutes');
 app.use('/subject', subjectRoutes);
 
-app.listen(PORT, () => {
+// Create an HTTP server
+const server = http.createServer(app);
+
+// Integrate Socket.IO
+const io = new Server(server, {
+  cors: {
+    origin: "http://localhost:3000",
+    methods: ["GET", "POST", "PATCH", "PUT", "DELETE"],
+    credentials: true,
+  },
+});
+// Handle WebSocket connections
+io.on("connection", (socket) => {
+  console.log("New client connected:", socket.id);
+
+  // Example: Handle a custom event
+  socket.on("message", (data) => {
+    console.log("Received message:", data);
+    // Optionally broadcast the message to all connected clients
+    io.emit("message", data);
+  });
+
+  // Handle client disconnect
+  socket.on("disconnect", () => {
+    console.log("Client disconnected:", socket.id);
+  });
+});
+
+// Start the server
+server.listen(PORT, () => {
   console.log(`Server is up and running on port no: ${PORT}`);
 });
+
+// Export server and io for external use
+module.exports = { io };

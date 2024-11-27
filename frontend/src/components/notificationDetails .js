@@ -1,5 +1,6 @@
 import React, { useState } from 'react';
 import axios from 'axios';
+import axiosInstance from '../axiosConfig';
 
 const NotificationDetails = ({ notification, onClose }) => {
   const [loading, setLoading] = useState(false);
@@ -7,7 +8,7 @@ const NotificationDetails = ({ notification, onClose }) => {
   const handleApproval = async (status) => {
     try {
       setLoading(true);
-      await axios.patch(`/user/notifications/${notification._id}/approve-reject`, { status });
+      await axiosInstance.patch(`/user/notifications/${notification._id}/approve-reject`, { status });
       alert(`Payment ${status.toLowerCase()} successfully`);
       setLoading(false);
       onClose();
@@ -28,7 +29,7 @@ const NotificationDetails = ({ notification, onClose }) => {
       <p><strong>Payment Date:</strong> {notification.paymentId.paymentDate}</p>
       <div className="receipt">
         <h4>Payment Receipt</h4>
-        <img src={`/${notification.paymentId.slipPath}`} alt="Payment Receipt" />
+        <img src={`http://localhost:8070/${notification.paymentId.slipPath.replace("\\", "/")}`} alt="Payment Receipt" />
       </div>
 
       <div className="actions">

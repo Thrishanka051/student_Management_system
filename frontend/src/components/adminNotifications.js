@@ -1,8 +1,11 @@
 import React, { useState, useEffect } from 'react';
 import axios from 'axios';
+import io from 'socket.io-client';
 import axiosInstance from '../axiosConfig';
 import NotificationDetails from './notificationDetails ';
 import '../styles/notification.css';
+
+const socket = io('http://localhost:8070');
 
 const AdminNotifications = () => {
   const [notifications, setNotifications] = useState([]);
@@ -14,12 +17,23 @@ const AdminNotifications = () => {
       try {
         const response = await axiosInstance.get('/user/notifications/admin');
         setNotifications(response.data);
+        console.log('res',response.data)
       } catch (error) {
         console.error('Error fetching notifications:', error);
       }
     };
 
     fetchNotifications();
+     // Set up WebSocket listener for real-time notifications
+     socket.on('newNotification', (notification) => {
+      setNotifications((prev) => [notification, ...prev]); // Add new notifications to the top
+    });
+
+    // Cleanup WebSocket listener on component unmount
+    return () => {
+      socket.off('newNotification');
+    };
+
   }, []);
 
   const handleNotificationClick = (notification) => {

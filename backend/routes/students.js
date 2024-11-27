@@ -1,4 +1,5 @@
 const express = require("express");
+const {io} = require('../server');
 const router= require("express").Router();
 const multer = require('multer');
 const fs = require('fs');
@@ -10,7 +11,7 @@ const {userVerification,roleMiddleware } = require("../Middlewares/AuthMiddlewar
 const generatePassword = require('../util/generatePassword'); // import the generate password function
 const Subject = require("../modules/subject");
 const Notification = require('../modules/notification')
-
+console.log(io);
 //const app = express();
 // Configure Multer storage
 const storage = multer.diskStorage({
@@ -189,6 +190,8 @@ router.post('/students/:id/upload-slip', upload.single('paymentSlip'), async (re
       slipPath,
     };
 
+    let notificationSent = false; // Flag to track whether a notification should be sent
+    
     if (pendingPaymentIndex > -1) {
       // Delete the previous pending slip file
       const oldSlipPath = Student.payments[pendingPaymentIndex].slipPath;
@@ -199,13 +202,14 @@ router.post('/students/:id/upload-slip', upload.single('paymentSlip'), async (re
     } else {
       // No pending payment, so add the new one to the payments array
       Student.payments.push(newPayment);
+      notificationSent = true; // Send notification if it's a new payment
     }
 
     // If the slip is approved, handle LIFO storage for the last three verified slips
-    if (status === 'Verified') {
+    if (status === 'Approved') {
       // Filter to keep only the last three verified payments in LIFO order
       Student.payments = Student.payments
-        .filter(payment => payment.status === 'Verified') // Keep only verified payments
+        .filter(payment => payment.status === 'Approved') // Keep only verified payments
         .slice(-3); // Keep the last three
     }
 
@@ -213,7 +217,8 @@ router.post('/students/:id/upload-slip', upload.single('paymentSlip'), async (re
     const savedStudent= await Student.save();
 
     // Create a notification for the admin(s)
-    const admins = await User.find({ role: 'admin' });
+    if (notificationSent){
+      const admins = await User.find({ role: 'admin' });
     const paymentId = savedStudent.payments[savedStudent.payments.length - 1]._id;
 
     for (const admin of admins) {
@@ -224,6 +229,20 @@ router.post('/students/:id/upload-slip', upload.single('paymentSlip'), async (re
         status: 'Pending',
         isRead: false,
       });
+
+      if (io) {
+        io.emit('newNotification', {
+          adminId: admin._id,
+          paymentId,
+          studentId,
+          message: `New payment submitted by ${Student.name}`,
+        });
+      } else {
+        console.log('WebSocket is not connected.');
+      }
+
+    }
+    
     }
 
     res.status(200).json({ message: 'Payment slip submitted successfully', payment: newPayment });

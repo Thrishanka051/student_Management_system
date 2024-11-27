@@ -54,11 +54,35 @@ router.get('/notifications/admin', userVerification, async (req, res) => {
 
     // Now populate the fields after the query resolves
     const populatedNotifications = await Notification.populate(notifications, [
-      { path: 'senderId', select: 'name' },  // Populate senderId with name
+      { path: 'senderId', select: 'name email payments' },  // Populate senderId with name
       
     ]);
 
-    res.status(200).json(populatedNotifications);
+    // Map through notifications and add corresponding payment details
+    const notificationsWithPayments = populatedNotifications.map(notification => {
+      const student = notification.senderId;
+      if (!student) return notification; // Skip if no student found
+
+      // Find the matching payment in the student's payments array
+      const payment = student.payments.find(p => p._id.toString() === notification.paymentId.toString());
+
+      // Attach the payment details to the notification
+      return {
+        ...notification.toObject(),
+        senderId: {
+          _id: student._id,
+          name: student.name,
+          age: student.age,
+          email: student.email,
+          image: student.image,
+        },
+        paymentId: payment || null, // Add payment details or null if not found
+      };
+    });
+
+    console.log('noti with pay', notificationsWithPayments)
+
+    res.status(200).json(notificationsWithPayments);
   } catch (error) {
     console.error('Error fetching notifications:', error);
     res.status(500).json({ message: 'Server error' });
@@ -73,18 +97,35 @@ router.patch('/notifications/:id/approve-reject', async (req, res) => {
 
     if (!notification) return res.status(404).json({ message: 'Notification not found' });
 
+    const senderStudent = await Student.findById(notification.senderId);
+    if (!senderStudent) return res.status(404).json({ message: 'sender Student not found' });
+
+    console.log('sender', senderStudent);
+
     // Update the notification and payment status
     notification.status = status;
     notification.isRead = true;
     await notification.save();
 
-    // Update the payment status in the student schema
-    const student = await Student.findOne({ 'payments._id': notification.paymentId });
-    const payment = student.payments.id(notification.paymentId);
-    payment.status = status;
-    await student.save();
+    // Find the specific payment in the payments array
+    const Payment = senderStudent.payments.find(
+      (payment) => payment._id.toString() === notification.paymentId.toString()
 
-    res.status(200).json({ message: `Payment ${status.toLowerCase()} successfully` });
+  );
+
+  console.log('element', Payment);
+
+  if (!Payment) {
+      return res.status(404).json({ message: 'Payment not found' });
+  }
+
+  // Update the status of the payment
+  Payment.status = status;
+
+  // Save the updated student document
+  await senderStudent.save();
+
+    res.status(200).json({ Payment, message: `Payment ${status.toLowerCase()} successfully` });
   } catch (error) {
     console.error('Error updating payment status:', error);
     res.status(500).json({ message: 'Server error' });
