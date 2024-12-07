@@ -3,3 +3,7 @@
 
 # Ignore the specific uploads folder in backend
 student_Management_system/student_Management_system/backend/uploads/
+
+# Ignore all .env files
+*.env
+
