@@ -190,11 +190,14 @@ router.post('/students/:id/upload-slip', upload.single('paymentSlip'), async (re
       slipPath,
     };
 
-    let notificationSent = false; // Flag to track whether a notification should be sent
+    //let notificationSent = false; // Flag to track whether a notification should be sent
     
     if (pendingPaymentIndex > -1) {
       // Delete the previous pending slip file
       const oldSlipPath = Student.payments[pendingPaymentIndex].slipPath;
+      const oldPayId = Student.payments[pendingPaymentIndex]._id;
+      // Find and delete the notification by paymentId
+      await Notification.deleteOne({ paymentId: oldPayId });
       deleteFile(oldSlipPath);
 
       // Replace the existing pending payment with the new one
@@ -217,7 +220,7 @@ router.post('/students/:id/upload-slip', upload.single('paymentSlip'), async (re
     const savedStudent= await Student.save();
 
     // Create a notification for the admin(s)
-    if (notificationSent){
+    if (true){
       const admins = await User.find({ role: 'admin' });
     const paymentId = savedStudent.payments[savedStudent.payments.length - 1]._id;
 
