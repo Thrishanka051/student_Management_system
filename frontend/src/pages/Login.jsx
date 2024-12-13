@@ -1,9 +1,19 @@
-import React, { useState } from "react";
+import React, { useState , useEffect} from "react";
 import { Link, useNavigate } from "react-router-dom";
 import axios from "axios";
 import { ToastContainer, toast } from "react-toastify";
 
 const Login = () => {
+  useEffect(() => {
+    // Change body background color only for the Login page
+    document.body.style.background = '90deg, rgba(0, 34, 64, 1) 0%, rgba(26, 51, 84, 1) 50%, rgba(41, 82, 113, 1) 100%';
+
+    // Clean up the background color when leaving the page
+    return () => {
+      document.body.style.background = ''; // Reset background
+    };
+  }, []);
+
   const navigate = useNavigate();
   const [inputValue, setInputValue] = useState({
     email: "",
@@ -59,225 +69,208 @@ const Login = () => {
 
   return (
     <div className="container">
-      <div className="login-box">
-      <h2>Login Account</h2>
-      <form onSubmit={handleSubmit}>
-        <div className="user-box">
-          <input
-            type="email"
-            name="email"
-            value={email}
-            onChange={handleOnChange}
-            required
-          />
-          <label htmlFor="email">Email</label>
-        </div>
-        <div className="user-box">
-          <input
-            type="password"
-            name="password"
-            value={password}
-            onChange={handleOnChange}
-            required
-          />
-          <label htmlFor="password">Password</label>
-        </div>
-        <button type="submit">
-          <span></span>
-          <span></span>
-          <span></span>
-          <span></span>
-          Submit
-        </button>
-        {/*<span>
-          Already have an account? <Link to={"/signup"}>Signup</Link>
-        </span>*/}
-      </form>
+      {/* Left Side */}
+      <div className="left">
+        
+        <h2>What's New in Eduman v5.2?</h2>
+        <ul>
+          <li>Exciting New Dashboard</li>
+          <li>Lorem Ipsum Dolor Set Amet</li>
+          <li>Volup Taruin Denotis Bliko Triolas</li>
+          <li>Exciting New Dashboard</li>
+        </ul>
       </div>
+
+      {/* Right Side */}
+      <div className="right animated">
+        <h2>Sign In</h2>
+        <form onSubmit={handleSubmit}>
+          <div className="form-group">
+            <label htmlFor="email">Email</label>
+            <input
+              type="email"
+              id="email"
+              name="email"
+              value={email}
+              onChange={handleOnChange}
+              placeholder="Enter your email"
+              required
+            />
+          </div>
+          <div className="form-group">
+            <label htmlFor="password">Password</label>
+            <input
+              type="password"
+              id="password"
+              name="password"
+              value={password}
+              onChange={handleOnChange}
+              placeholder="Enter your password"
+              required
+            />
+          </div>
+          <button className="btn" type="submit">Login</button>
+        </form>
+        <div className="footer">
+          <a href="#">Forgot Password?</a>
+        </div>
+      </div>
+
       <style>
-    {`
-       /* Reset some basic styles */
-* {
-  margin: 0;
-  padding: 0;
-  box-sizing: border-box;
-  font-family: Arial, sans-serif;
-}
+        {`
+          * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+          }
 
-body {
-  background: linear-gradient(90deg, rgba(44, 62, 80, 1) 0%, rgba(127, 140, 141, 1) 100%);
-  height: 100vh;
-  display: flex;
-  justify-content: center;
-  align-items: center;
-}
+          body {
+            font-family: Arial, sans-serif;
+            background-color: #fff;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+          }
 
-.container {
-  width: 100%;
-  display: flex;
-  justify-content: center;
-  align-items: center;
-}
+          .container {
+            display: flex;
+           background:  linear-gradient(135deg, rgba(129, 212, 250, 0.6), rgba(79, 195, 247, 0.6)), url('https://communications.catholic.edu/_media/magazine/2021/winter-2021/faculty-essay.jpg') no-repeat center center;
+            width: 900px;
+            height: 500px;
+            border-radius: 12px;
+            overflow: hidden;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.2);
+          }
 
-.login-box {
-  background: rgba(0, 0, 0, 0.8);
-  padding: 40px;
-  border-radius: 10px;
-  box-shadow: 0 15px 25px rgba(0, 0, 0, 0.5);
-  text-align: center;
-  color: #fff;
-}
+          .left {
+          flex: 1;  
+          background-size: cover;
+          color: black;
+          font-weight: bold;
+          display: flex;
+          flex-direction: column;
+          justify-content: center;
+          align-items: center;
+          padding: 20px;
+        }
 
-.login-box h2 {
-  margin-bottom: 30px;
-  font-size: 24px;
-}
+          .left img {
+            max-width: 100%;
+            height: auto;
+            margin-bottom: 20px;
+            border-radius: 10px;
+          }
 
-.user-box {
-  position: relative;
-  margin-bottom: 30px;
-}
+          .left h2 {
+            font-size: 24px;
+            margin-bottom: 20px;
+            color:black;
+            font-weight: bold;
+          }
 
-.user-box input {
-  width: 100%;
-  padding: 10px 0;
-  background: transparent;
-  border: none;
-  border-bottom: 2px solid #fff;
-  outline: none;
-  color: #fff;
-  font-size: 16px;
-}
+          .left ul {
+            list-style: none;
+          }
 
-.user-box label {
-  position: absolute;
-  top: 0;
-  left: 0;
-  padding: 10px 0;
-  pointer-events: none;
-  transition: 0.5s;
-}
+          .left ul li {
+            margin: 10px 0;
+            display: flex;
+            align-items: center;
+            font-size: 18px;
+          }
 
-.user-box input:focus ~ label,
-.user-box input:valid ~ label {
-  top: -20px;
-  left: 0;
-  color: #03e9f4;
-  font-size: 12px;
-}
+          .left ul li:before {
+            content: '\u2713';
+            color: black;
+            font-weight: bold;
+            margin-right: 10px;
+          }
 
-button {
-  position: relative;
-  display: inline-block;
-  padding: 10px 20px;
-  color: #03e9f4;
-  background-color: rgba(0, 0, 0, 0.8);
-  font-size: 16px;
-  text-decoration: none;
-  text-transform: uppercase;
-  overflow: hidden;
-  transition: 0.5s;
-  margin-top: 40px;
-  letter-spacing: 4px;
-  border: none;
-}
+           .right {
+          flex: 1;
+          background: #2c2f3f;
+          color: white;
+          display: flex;
+          flex-direction: column;
+          justify-content: center;
+          align-items: center;
+          padding: 20px;
+          transform: translateX(300px); /* Initial position off-screen */
+          opacity: 0;
+        }
 
-button:hover {
-  background: #03e9f4;
-  color: #fff;
-  border-radius: 5px;
-  box-shadow: 0 0 5px #03e9f4,
-              0 0 25px #03e9f4,
-              0 0 50px #03e9f4,
-              0 0 100px #03e9f4;
-}
+        .animated {
+          animation: slideIn 1s ease-out forwards;
+        }
 
-button span {
-  position: absolute;
-  display: block;
-}
+        @keyframes slideIn {
+          0% {
+            transform: translateX(300px); /* Start from off-screen */
+            opacity: 0;
+          }
+          100% {
+            transform: translateX(0); /* Final position */
+            opacity: 1;
+          }
+        }
 
-button span:nth-child(1) {
-  top: 0;
-  left: -100%;
-  width: 100%;
-  height: 2px;
-  background: linear-gradient(90deg, transparent, #03e9f4);
-  animation: btn-anim1 1s linear infinite;
-}
+          .right h2 {
+            margin-bottom: 20px;
+          }
 
-button span:nth-child(2) {
-  top: -100%;
-  right: 0;
-  width: 2px;
-  height: 100%;
-  background: linear-gradient(180deg, transparent, #03e9f4);
-  animation: btn-anim2 1s linear infinite;
-  animation-delay: 0.25s;
-}
+          .form-group {
+            margin-bottom: 15px;
+            width: 100%;
+          }
 
-button span:nth-child(3) {
-  bottom: 0;
-  right: -100%;
-  width: 100%;
-  height: 2px;
-  background: linear-gradient(270deg, transparent, #03e9f4);
-  animation: btn-anim3 1s linear infinite;
-  animation-delay: 0.5s;
-}
+          .form-group label {
+            display: block;
+            margin-bottom: 5px;
+            font-size: 14px;
+          }
 
-button span:nth-child(4) {
-  bottom: -100%;
-  left: 0;
-  width: 2px;
-  height: 100%;
-  background: linear-gradient(360deg, transparent, #03e9f4);
-  animation: btn-anim4 1s linear infinite;
-  animation-delay: 0.75s;
-}
+          .form-group input {
+            width: 100%;
+            padding: 10px;
+            border: none;
+            border-radius: 5px;
+            outline: none;
+            background: #44475a;
+            color: white;
+          }
 
-@keyframes btn-anim1 {
-  0% {
-    left: -100%;
-  }
-  50%, 100% {
-    left: 100%;
-  }
-}
+          .btn {
+            background: #6c63ff;
+            color: white;
+            border: none;
+            padding: 10px 20px;
+            border-radius: 5px;
+            cursor: pointer;
+            transition: 0.3s;
+          }
 
-@keyframes btn-anim2 {
-  0% {
-    top: -100%;
-  }
-  50%, 100% {
-    top: 100%;
-  }
-}
+          .btn:hover {
+            background: #5753e5;
+          }
 
-@keyframes btn-anim3 {
-  0% {
-    right: -100%;
-  }
-  50%, 100% {
-    right: 100%;
-  }
-}
+          .footer {
+            margin-top: 15px;
+            font-size: 14px;
+            color: #999;
+          }
 
-@keyframes btn-anim4 {
-  0% {
-    bottom: -100%;
-  }
-  50%, 100% {
-    bottom: 100%;
-  }
-}
-
-
-    `}
-</style>
- 
+          .footer a {
+            color: #6c63ff;
+            text-decoration: none;
+          }
+        `}
+      </style>
     </div>
   );
+
+
+  
 };
 
 export default Login;
