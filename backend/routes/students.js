@@ -13,6 +13,7 @@ const {userVerification,roleMiddleware } = require("../Middlewares/AuthMiddlewar
 const generatePassword = require('../util/generatePassword'); // import the generate password function
 const Subject = require("../modules/subject");
 const Notification = require('../modules/notification')
+const { calculateZScoresAndRank } = require("../Middlewares/zScoreService");
 console.log(io);
 //const app = express();
 // Configure Multer storage
@@ -114,12 +115,21 @@ router.post('/add', userVerification, roleMiddleware('admin'), async (req, res) 
 router.route("/").get(userVerification,async(req,res)=>{
     
     await student.find().then((students)=>{
-        //console.log('Students fetched:', students);
+        console.log('Students fetched:', students);
         res.json(students)
     })
     .catch((err)=>{
         console.log(err)
     })
+})
+
+router.route("/rank-students").get(userVerification, async (req, res) => {
+  try {
+    const rankings = await calculateZScoresAndRank();
+    res.status(200).json(rankings);
+  } catch (err) {
+    res.status(500).json({ message: "Error fetching rankings", error: err.message });
+  }
 })
 
 router.route("/update/:id").put(userVerification, upload.single('image'),async(req,res)=>{

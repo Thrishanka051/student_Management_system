@@ -24,6 +24,12 @@ const studentSchema = new schema(
             type:String,
             required: true
         },
+        zScore:{
+            type:Number
+        },
+        rank:{
+            type:Number
+        },
         image: {
             type: String, // This will store the path of the uploaded image
             default: 'http://localhost:8070/uploads/1728725895909.png'   // Optional: Default value if no image is uploaded

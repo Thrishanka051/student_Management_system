@@ -3,6 +3,7 @@ const router = express.Router();
 const { userVerification , roleMiddleware} = require('../Middlewares/AuthMiddleware');
 const Subject = require('../modules/subject');
 const Student = require('../modules/Student');
+const { calculateZScoresAndRank } = require("../Middlewares/zScoreService");
 
 router.get('/students',userVerification, async (req, res) => {
 
@@ -10,15 +11,39 @@ router.get('/students',userVerification, async (req, res) => {
   //the lean() method is used to return plain JavaScript objects instead of Mongoose documents.
   //students: An array of plain JavaScript objects representing all documents in the Student collection.
 
+  try {
+    // Fetch all students and subjects
     const students = await Student.find().lean();
     const subjects = await Subject.find().lean();
-  
+
+    // Merge students with their corresponding marks
     const studentData = students.map(student => {
       const subject = subjects.find(sub => sub.studentId.toString() === student._id.toString());
       return { ...student, marks: subject ? subject : { maths: 0, chemistry: 0, physics: 0 } };
     });
-  
-    res.send(studentData);
+
+    // Fetch or calculate rankedStudents array (this would be replaced by your actual logic)
+    const rankedStudents = await calculateZScoresAndRank();
+    // Create a map for quick lookups of rank
+    const rankMap = new Map(rankedStudents.map((rank, index) => [rank.studentId, index]));
+
+    // Sort studentData based on rankedStudents order
+    /*const sortedStudentData = studentData.sort((a, b) => {
+      const rankA = rankMap.get(a._id.toString()) ?? Infinity; // Default to Infinity if not ranked
+      const rankB = rankMap.get(b._id.toString()) ?? Infinity;
+      return rankA - rankB;
+    });*/
+
+    const sortedStudentData = rankedStudents.map(data => 
+      studentData.find(student => student._id.toString() === data.studentId.toString())
+  );
+
+    // Send the sorted data
+    res.send(sortedStudentData);
+  } catch (err) {
+    console.error("Error fetching and sorting student data:", err);
+    res.status(500).send({ error: "An error occurred while processing student data." });
+  }
   });
 
   router.post('/students/:id/marks', userVerification, roleMiddleware('admin'), async (req, res) => {

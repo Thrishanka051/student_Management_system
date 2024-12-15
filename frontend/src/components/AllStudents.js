@@ -199,7 +199,7 @@ export default function AllStudents({ searchQuery }) {
                                 ) : (
                                     <div>
                                         <h5 class="customCard-header card-header flex-wrap " style={{wordWrap:'break-word' , overflowWrap:'break-word'}}>
-                                        <img src={`http://localhost:8070${student.image}`} alt="Student" style={{ width: '100%', height: '200px', objectFit: 'cover', marginBottom: '10px' }} />{student.name}
+                                        {'Rank: '}{student.rank}<img src={`http://localhost:8070${student.image}`} alt="Student" style={{ width: '100%', height: '200px', objectFit: 'cover', marginBottom: '10px' }} />{student.name}
 
                                         </h5>
                                         <p class="customCard-text card-text">
@@ -212,6 +212,9 @@ export default function AllStudents({ searchQuery }) {
                                              Maths: {student.marks.maths}<br/>
                                              Chemistry : {student.marks.chemistry}<br/>
                                              Physics: {student.marks.physics}
+                                        </p>
+                                        <p class="customCard-text card-text" style={{fontWeight:'bold'}}>
+                                             Z-Score: {student.zScore.toFixed(4)}<br/> 
                                         </p>
 
                                         
