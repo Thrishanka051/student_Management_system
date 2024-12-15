@@ -4,6 +4,8 @@ const router= require("express").Router();
 const multer = require('multer');
 const fs = require('fs');
 const path = require('path');
+require("dotenv").config();
+const nodemailer = require('nodemailer');
 const student= require("../modules/Student");
 const User = require('../modules/UserModel');
 const bcrypt = require('bcrypt');
@@ -61,6 +63,31 @@ router.post('/add', userVerification, roleMiddleware('admin'), async (req, res) 
     const password = generatePassword();
     //const hashedPassword = await bcrypt.hash(password, 10);
 
+    console.log('user:',process.env.EMAIL, 'pass:',process.env.EMAIL_PASSWORD)
+
+       // Configure nodemailer
+       const transporter = nodemailer.createTransport({
+        
+        host: "smtp.office365.com",
+        port: 587,
+        secure: false,
+        auth: {
+            user: process.env.EMAIL, // Your email
+            pass: process.env.EMAIL_PASSWORD, // Your email password or app password
+        },
+    });
+  
+    // Email content
+    const mailOptions = {
+        from: process.env.EMAIL,
+        to: email,
+        subject: 'Your Account Password',
+        text: `Hi ${name},\n\nYour account has been created. Here is your password: ${password}\n\nPlease change it after logging in.`,
+    };
+  
+    // Send email
+    await transporter.sendMail(mailOptions);
+
     // Create the user
     const user = new User({
       email:email,
@@ -73,6 +100,8 @@ router.post('/add', userVerification, roleMiddleware('admin'), async (req, res) 
     // Create the student and link to the user
     const newStudent = new student({ name, age, email, user: user._id });
     await newStudent.save();
+
+ 
 
     res.json({ message: 'Student added', username: user.username, password });
   } catch (err) {

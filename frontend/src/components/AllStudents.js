@@ -241,7 +241,7 @@ export default function AllStudents({ searchQuery }) {
             <style>
                 {`
                 .customCard {
-                    background: linear-gradient(135deg, #f5f7fa, #c3cfe2);
+                    
                     border-radius: 15px;
                     box-shadow: 0 8px 16px rgba(0, 0, 0, 0.2);
                     display: flex;

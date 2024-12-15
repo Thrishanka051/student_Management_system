@@ -57,7 +57,7 @@ export default function AddStudent() {
             </form>
             {generatedPassword && (
         <div className="alert alert-success mt-3">
-          <p>Student added successfully. The generated password is: <strong>{generatedPassword}</strong></p>
+          <p>Student added successfully. The generated password was sent to email</p>
         </div>
       )}
             <style>
