@@ -25,10 +25,10 @@ const studentSchema = new schema(
             required: true
         },
         zScore:{
-            type:Number
+            type:Number,
         },
         rank:{
-            type:Number
+            type:Number,
         },
         image: {
             type: String, // This will store the path of the uploaded image

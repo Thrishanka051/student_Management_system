@@ -102,6 +102,15 @@ router.post('/add', userVerification, roleMiddleware('admin'), async (req, res) 
     const newStudent = new student({ name, age, email, user: user._id });
     await newStudent.save();
 
+    // Create the subject document for the student
+    const subject = new Subject({
+      studentId: newStudent._id,  // Linking the student to the subject document
+      maths: 0,
+      chemistry: 0,
+      physics: 0,
+    });
+    await subject.save();
+
  
 
     res.json({ message: 'Student added', username: user.username, password });
@@ -206,8 +215,11 @@ router.route("/get/:id").get(userVerification,async(req,res)=>{
 router.post('/students/:id/upload-slip', upload.single('paymentSlip'), async (req, res) => {
   try {
     const studentId = req.params.id;
-    const { transactionId, amount, paymentDate, payerName, status } = req.body;
+    const { transactionId, amount, transactionDate, payerName, status } = req.body;
+    console.log('pay: ',req.body);
     const slipPath = req.file.path; // Path to the uploaded slip
+
+    const paymentDate= transactionDate;
 
     // Find the student document
     const Student = await student.findById(studentId);

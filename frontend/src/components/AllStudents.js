@@ -152,7 +152,7 @@ export default function AllStudents({ searchQuery }) {
             <h1 className="h1" style={{ color: '#fff', fontWeight: 'bold' ,float:'left'}}>All students</h1>
             
             <div style={{float:'right'}} >
-                {userRole== 'user' &&(<button onClick={handleProfile} className="btn btn-primary">profile</button>)}
+                {userRole== 'user' &&(<button onClick={handleProfile} className="btn btn-primary" style={{position:'fixed'}}>profile</button>)}
                 
             </div>
         
@@ -199,7 +199,7 @@ export default function AllStudents({ searchQuery }) {
                                 ) : (
                                     <div>
                                         <h5 class="customCard-header card-header flex-wrap " style={{wordWrap:'break-word' , overflowWrap:'break-word'}}>
-                                        {'Rank: '}{student.rank}<img src={`http://localhost:8070${student.image}`} alt="Student" style={{ width: '100%', height: '200px', objectFit: 'cover', marginBottom: '10px' }} />{student.name}
+                                        {'Rank: '}{student.rank ? student.rank : 'N/A' }<img src={`http://localhost:8070${student.image}`} alt="Student" style={{ width: '100%', height: '200px', objectFit: 'cover', marginBottom: '10px' }} />{student.name}
 
                                         </h5>
                                         <p class="customCard-text card-text">
@@ -214,7 +214,7 @@ export default function AllStudents({ searchQuery }) {
                                              Physics: {student.marks.physics}
                                         </p>
                                         <p class="customCard-text card-text" style={{fontWeight:'bold'}}>
-                                             Z-Score: {student.zScore.toFixed(4)}<br/> 
+                                             Z-Score: {student.zScore ? student.zScore.toFixed(4) :'N/A' }<br/> 
                                         </p>
 
                                         
