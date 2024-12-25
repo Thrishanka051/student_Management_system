@@ -227,11 +227,12 @@ const extractDate = (text) => {
         <button type="submit" className="custom-submit-btn">Submit</button>
       </form>
 
-      {/* Debugging - Show extracted OCR text */}
-      <div className="ocr-result">
+      {/* Debugging - Show extracted OCR text 
+         <div className="ocr-result">
         <h3>Extracted Text (Debugging)</h3>
         <pre>{ocrText}</pre>
-      </div>
+      </div>*/}
+     
     </div>
   );
 };
