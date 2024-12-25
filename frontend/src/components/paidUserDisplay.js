@@ -13,7 +13,7 @@ const StudentPayments = () => {
   useEffect(() => {
     const fetchStudents = async () => {
       try {
-        const response = await axiosInstance.get("/student/", { withCredentials: true }); // Replace with your API endpoint
+        const response = await axiosInstance.get("/student/", { withCredentials: true }); 
         setStudents(response.data);
         categorizePayments(response.data);
       } catch (err) {
@@ -78,12 +78,12 @@ const StudentPayments = () => {
             </div>
           ))
         ) : (
-          <p>No students have paid for this month.</p>
+          <p style={{color:'white'}}>No students have paid for this month.</p>
         )}
       </div>
 
       <div className="students-column not-paid-students">
-        <h2>Not Paid Students</h2>
+        <h2>Pending Students</h2>
         {notPaidStudents.length > 0 ? (
           notPaidStudents.map((student) => (
             <div
@@ -105,7 +105,7 @@ const StudentPayments = () => {
             </div>
           ))
         ) : (
-          <p>All students have paid for this month.</p>
+          <p style={{color:'white'}}>All students have paid for this month.</p>
         )}
       </div>
     </div>

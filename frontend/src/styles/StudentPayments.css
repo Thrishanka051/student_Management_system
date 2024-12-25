@@ -1,6 +1,6 @@
 /* Container for the whole page */
 .student-payments-container {
-    margin-top: 50px;
+    margin: 50px;
     display: flex;
     justify-content: space-between;
     gap: 20px;
@@ -11,11 +11,11 @@
   /* Styling for each column */
   .students-column {
     width: 45%;
-    border: 1px solid #ddd;
+    
     border-radius: 10px;
     padding: 10px;
-    background-color: #f9f9f9;
-    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+    
+    
   }
   
   /* Headings for the columns */
@@ -23,7 +23,7 @@
     text-align: center;
     margin-bottom: 15px;
     font-size: 1.5em;
-    color:#000;
+    color:#fff;
   }
   
   /* Styling for student cards */
