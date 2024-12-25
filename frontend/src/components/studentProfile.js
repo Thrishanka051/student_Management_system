@@ -23,14 +23,15 @@ export default function UserProfile({isOpen, onClose, userId, getAll}) {
   const [selectedFile , setSelectedFile] = useState (null);
   const [slip,setSlip] = useState(false);
   const [showModal, setShowModal] = useState(false);
+  const [paymentStatus, setPaymentStatus] = useState('');
+  const [paymentStyle, setPaymentStyle] = useState({});
 
   const handleOpenModal = () => {
     setShowModal(true);
+    
   };
 
-  const handleCloseModal = () => {
-    setShowModal(false);
-  };
+ 
   
 
   useEffect(()=>{
@@ -145,6 +146,58 @@ export default function UserProfile({isOpen, onClose, userId, getAll}) {
       
     }
 
+    const displayPaymentStatus = () => {
+      if (!user.payments || user.payments.length === 0) {
+          // No payments, mark as not paid
+          setPaymentStatus('Your this month payment is pending');
+          setPaymentStyle({ backgroundColor: 'red', border: '1px solid black', padding: '10px', fontWeight:'bold', color:'white' });
+      } else {
+          const recentPayment = user.payments[user.payments.length - 1];
+          const paymentDate = recentPayment.paymentDate ? new Date(recentPayment.paymentDate) : null;
+
+          // Check if the paymentDate is valid
+          if (paymentDate && paymentDate instanceof Date && !isNaN(paymentDate)) {
+              const currentDate = new Date();
+
+              // Check if the payment is from this month
+              if (paymentDate.getMonth() !== currentDate.getMonth() || paymentDate.getFullYear() !== currentDate.getFullYear()) {
+                  // Payment is from a past month or invalid
+                  setPaymentStatus('Your this month payment is pending');
+                  setPaymentStyle({ backgroundColor: 'red', border: '1px solid black', padding: '10px', fontWeight:'bold', color:'white'});
+              } else if (recentPayment.status === 'Pending') {
+                  // Payment is current month but not approved
+                  setPaymentStatus('Payment was submitted to admin review');
+                  setPaymentStyle({ backgroundColor: 'yellow', border: '1px solid black', padding: '10px' , fontWeight:'bold', color:'black'});
+              } else if (recentPayment.status === 'Rejected') {
+                  // Payment is current month and rejected
+                  setPaymentStatus('Your payment was rejected');
+                  setPaymentStyle({ backgroundColor: 'red', border: '1px solid black', padding: '10px' , fontWeight:'bold', color:'white'});
+              } else {
+                  // Payment is current month and approved
+                  setPaymentStatus('Your payment is approved');
+                  setPaymentStyle({ backgroundColor: '#32CD32', border: '1px solid black', padding: '10px', fontWeight:'bold', color:'black' });
+              }
+          } else {
+              // Invalid or missing payment date
+              setPaymentStatus('Invalid or missing payment date');
+              setPaymentStyle({ backgroundColor: 'red', border: '1px solid black', padding: '10px', fontWeight:'bold' , color:'white'});
+          }
+      }
+  };
+
+  useEffect(() => {
+      displayPaymentStatus();
+  }, [user.payments]);
+
+  const handleCloseModal = () => {
+    setShowModal(false);
+    displayPaymentStatus();
+  };
+
+  const handlePaymentStatusRefresh = () => {
+        displayPaymentStatus(); // Refresh payment status when called
+    };
+
   return (
     <div className={`profile-sidebar ${sidebar ? 'open' : ''}`}>
       { /* slip ? (
@@ -156,7 +209,7 @@ export default function UserProfile({isOpen, onClose, userId, getAll}) {
       ):( */}
       <div className="container mt-25">
       <div className="d-flex justify-content-between align-items-center mb-4">
-        <h1 className="h1 mb-4" style={{color:"#fff"}}>User Profile</h1>
+        <h1 className="h1 mb-2" style={{color:"#fff"}}>User Profile</h1>
         <i className="fa-regular fa-circle-xmark h2 custom-hover-effect" onClick={handleClose}  />
       </div>
 
@@ -268,9 +321,14 @@ export default function UserProfile({isOpen, onClose, userId, getAll}) {
           
         </div>
         
-        <div>
+        <div className='mb-2'>
             <button className='btn btn-warning mt-0' onClick={handlePassword}>Change Password</button>
             <button className='btn btn-primary mt-0' onClick={handleOpenModal}>Upload Slip</button>
+          </div>
+          <div>
+          <div style={paymentStyle}>
+                {paymentStatus}
+            </div>
           </div>
       </div>
       )}
@@ -284,7 +342,7 @@ export default function UserProfile({isOpen, onClose, userId, getAll}) {
           <PaymentSlipUpload studentId={userId} />
         </Modal.Body>
         <Modal.Footer>
-          <Button variant="secondary" onClick={handleCloseModal}>
+          <Button variant="secondary" onClick={handleCloseModal} onPaymentStatusRefresh={handlePaymentStatusRefresh}>
             Close
           </Button>
         </Modal.Footer>

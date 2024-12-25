@@ -3,7 +3,7 @@ import axiosInstance from '../axiosConfig';
 import Tesseract from 'tesseract.js';
 import '../styles/uploadSlip.css';
 
-const PaymentSlipUpload = ({studentId}) => {
+const PaymentSlipUpload = ({studentId, onPaymentStatusRefresh}) => {
   const [formData, setFormData] = useState({
     transactionId: '',
     transactionDate: '',
@@ -116,9 +116,11 @@ const extractDate = (text) => {
       const response = await axiosInstance.post(`student/students/${studentId}/upload-slip`, formData, config);
       console.log('Response2:', response.data);
       setIsSubmitted(true);
+      onPaymentStatusRefresh();
     } catch (error) {
       console.error('Error submitting payment slip:', error);
     }
+    
   };
 
   // Conditionally render based on submission status
