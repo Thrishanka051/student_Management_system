@@ -72,12 +72,12 @@ const Login = () => {
       {/* Left Side */}
       <div className="left">
         
-        <h2>What's New in Eduman v5.2?</h2>
+        <h2>What's New in MyInstitute v1.0?</h2>
         <ul>
           <li>Exciting New Dashboard</li>
-          <li>Lorem Ipsum Dolor Set Amet</li>
-          <li>Volup Taruin Denotis Bliko Triolas</li>
-          <li>Exciting New Dashboard</li>
+          <li>Interactive Student Managing</li>
+          <li>Z-Score Based ranking</li>
+          <li>Monthly Payment Slip verification</li>
         </ul>
       </div>
 
