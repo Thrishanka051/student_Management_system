@@ -241,7 +241,7 @@ router.post('/students/:id/upload-slip', upload.single('paymentSlip'), async (re
       slipPath,
     };
 
-    //let notificationSent = false; // Flag to track whether a notification should be sent
+    let notificationSent = false; // Flag to track whether a notification should be sent
     
     if (pendingPaymentIndex > -1) {
       // Delete the previous pending slip file

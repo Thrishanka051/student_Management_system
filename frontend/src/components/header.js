@@ -118,6 +118,19 @@ function Header1({ setSearchQuery, searchQuery }) {
                                 Notifications
                             </Link>
                         </li>
+                        <li className="nav-item">
+                            <Link
+                                to="/payDetails"
+                                className="nav-link"
+                                style={{
+                                    ...linkStyles,
+                                    backgroundColor: activeTab === "Payments" ? 'red' : 'green',
+                                }}
+                                onClick={() => handleTabClick("Payments")}
+                            >
+                                Payments
+                            </Link>
+                        </li>
                         
                         </>)}
                         

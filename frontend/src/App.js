@@ -9,6 +9,7 @@ import StudentProfile from './components/studentProfile';
 import MarksList from './components/MarksList';
 import PaymentSlipUpload from './components/UploadSlip'
 import AdminNotifications from './components/adminNotifications'
+import StudentPayments from './components/paidUserDisplay'
 import '@fortawesome/fontawesome-free/css/all.min.css';
 
 function App() {
@@ -35,6 +36,7 @@ function App() {
           <Route path="/marksList" element={<MarksList />} />
           <Route path="/upload-slip" component={PaymentSlipUpload} />
           <Route path="/admin-notify" element={<AdminNotifications />} />
+          <Route path="/payDetails" element={<StudentPayments />} />
         </Routes>
 
       <style>{`
