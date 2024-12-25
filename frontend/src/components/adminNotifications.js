@@ -13,17 +13,9 @@ const AdminNotifications = () => {
 
   // Fetch notifications from the backend
   useEffect(() => {
-    const fetchNotifications = async () => {
-      try {
-        const response = await axiosInstance.get('/user/notifications/admin');
-        setNotifications(response.data);
-        console.log('res',response.data)
-      } catch (error) {
-        console.error('Error fetching notifications:', error);
-      }
-    };
-
     fetchNotifications();
+
+    /*fetchNotifications();
      // Set up WebSocket listener for real-time notifications
      socket.on('newNotification', (notification) => {
       setNotifications((prev) => [notification, ...prev]); // Add new notifications to the top
@@ -32,12 +24,23 @@ const AdminNotifications = () => {
     // Cleanup WebSocket listener on component unmount
     return () => {
       socket.off('newNotification');
-    };
+    };*/
 
   }, []);
+  const fetchNotifications = async () => {
+    try {
+      const response = await axiosInstance.get('/user/notifications/admin');
+      setNotifications(response.data);
+      console.log('res',response.data)
+    } catch (error) {
+      console.error('Error fetching notifications:', error);
+    }
+  };
+  
 
   const handleNotificationClick = (notification) => {
     setSelectedNotification(notification);
+    fetchNotifications();
   };
 
   return (
