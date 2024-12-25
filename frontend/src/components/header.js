@@ -59,7 +59,7 @@ function Header1({ setSearchQuery, searchQuery }) {
     return (
         <nav className="navbar navbar-expand-lg navbar-dark bg-dark" style={{ zIndex: '1000', width: '100%', position: 'fixed', top: 0 }}>
             <div className="container-fluid">
-                <a className="navbar-brand" href="#">Navbar</a>
+                
                 <button className="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav" aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation">
                     <span className="navbar-toggler-icon"></span>
                 </button>
@@ -85,11 +85,11 @@ function Header1({ setSearchQuery, searchQuery }) {
                                 className="nav-link"
                                 style={{
                                     ...linkStyles,
-                                    backgroundColor: activeTab === "Create Student" ? 'red' : 'green',
+                                    backgroundColor: activeTab === "Add Student" ? 'red' : 'green',
                                 }}
-                                onClick={() => handleTabClick("Create Student")}
+                                onClick={() => handleTabClick("Add Student")}
                             >
-                                Create Student
+                                Add Student
                             </Link>
                         </li>
                         <li className="nav-item">
