@@ -1,4 +1,3 @@
-```markdown
 # Student Management System  
 
 ## Overview  
@@ -47,7 +46,7 @@ Before running this project, ensure you have the following installed:
 
 ### Clone the Repository  
 ```bash  
-git clone https://github.com/your-username/student-management-system.git  
+git clone https://github.com/Thrishanka051/student_management_system.git  
 cd student-management-system  
 ```  
 
@@ -114,10 +113,7 @@ student-management-system/
 └── README.md  
 ```  
 
-## Future Enhancements  
-- Integration with SMS/Email notifications for payment reminders.  
-- Data visualization for admin dashboards.  
-- Export student data as CSV for offline analysis.  
+
 
 ## Contributing  
 Contributions are welcome!  
@@ -126,8 +122,3 @@ Contributions are welcome!
 3. Make your changes and commit them.  
 4. Open a pull request.  
 
-## License  
-This project is licensed under the MIT License.  
-```
-
-You can paste this directly into your `README.md` file on GitHub. Replace placeholders like `your-username` and `your_mongodb_connection_string` with your actual details.
